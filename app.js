@@ -21,7 +21,7 @@ function sleep(milliseconds) {
 
         // Open SearchMobileConnected.php and wait for response
         const searchMobileConnected = await browser.newPage();
-        await searchMobileConnected.goto('https://redpaal.com/accueil/SearchMobilConnected.php?id=123456', { waitUntil: 'networkidle0', timeout: 0 });
+        await searchMobileConnected.goto('https://redpaal.com/accueil/SearchMobilConnected.php?id=27102022', { waitUntil: 'networkidle0', timeout: 0 });
 
         await searchMobileConnected.waitForSelector('body')
         let mobileConnected = await searchMobileConnected.evaluate(() => {
@@ -112,7 +112,7 @@ function sleep(milliseconds) {
 
                     // Open AskMeetMob.php and wait for Response
                     const askMeetMob = await browser.newPage();
-                    await askMeetMob.goto('https://redpaal.com/accueil/AskMeetmob.php?id=123456', { waitUntil: 'networkidle0', timeout: 0 });
+                    await askMeetMob.goto('https://redpaal.com/accueil/AskMeetmob.php?id=27102022', { waitUntil: 'networkidle0', timeout: 0 });
 
                     await askMeetMob.waitForSelector('body')
                     let customer = await askMeetMob.evaluate(() => {
@@ -141,10 +141,29 @@ function sleep(milliseconds) {
                     await input.type(customerPhone);
                     await recharge.click('#sbmtButton');
 
+                    let meetMobReport = '';
+
+                    // Get Report Messages
+                    // If report is successful
+                    let successAlert = await recharge.waitForSelector('div.NewSuccess', {timeout: 3000});
+                    if(successAlert != null) {
+                        let element = await recharge.$('div.NewSuccess')
+                        meetMobReport = await recharge.evaluate(el => el.innerText, element)
+                    }
+
+                    // If report is error
+                    let errorAlert = await recharge.waitForSelector('#warning > div', {timeout: 3000});
+                    if(errorAlert != null) {
+                        let element = await recharge.$('#warning > div')
+                        meetMobReport = await recharge.evaluate(el => el.innerText, element)
+                    }
+
+                    console.log(meetMobReport);
+
                     // Open MeetMobResult.php and send report
                     const meetMobResult = await browser.newPage();
                     await meetMobResult.goto(
-                        'https://redpaal.com/accueil/MeetmobResult?id=123456*'+customerPhone+"*success",
+                        'https://redpaal.com/accueil/MeetmobResult.php?id=27102022*'+customerPhone+"*"+meetMobReport,
                         { waitUntil: 'networkidle0', timeout: 0 }
                     );
                 })
